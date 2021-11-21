@@ -30,7 +30,6 @@ def make_request(url):
 	'Cookie': 'guest_id=v1%3A163737786669411976; guest_id_ads=v1%3A163737786669411976; guest_id_marketing=v1%3A163737786669411976; personalization_id="v1_aWpM9WOyDOP2MOKXoniauQ=="'
 	}
 	response = requests.request("GET", url, headers=headers, data=payload)
-	print(response)
 	json_data =  response.json()
 	return json_data
 
