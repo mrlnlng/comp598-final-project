@@ -22,11 +22,16 @@ def generate_url(query_dict,token=None):
 	else:
 		return f"https://api.twitter.com/2/tweets/search/recent?next_token={token}&{generated_string}"
 
-def make_request(url):
+
+def get_token(token_path="../token.dev"):
+	with open(token_path,"r") as f:
+		return f.read()
+	
+def make_request(url,request_token=get_token()):
 	payload={}
 	all_data = []
 	headers = {
-	'Authorization': 'Bearer AAAAAAAAAAAAAAAAAAAAAOXwVwEAAAAAzDd4273uPjuiarxD3vE0H%2BemInU%3DOkLZztaVaKLjJpMj3FbXTBqiVPAcO1YyfAbFiTebknXUbSeo6B',
+	'Authorization': request_token,
 	'Cookie': 'guest_id=v1%3A163737786669411976; guest_id_ads=v1%3A163737786669411976; guest_id_marketing=v1%3A163737786669411976; personalization_id="v1_aWpM9WOyDOP2MOKXoniauQ=="'
 	}
 	response = requests.request("GET", url, headers=headers, data=payload)
@@ -96,12 +101,12 @@ def generate_output(output, data):
 			writer.writerow(values)	
 
 def main():
-	start_time = "2021-11-15T00:00:00Z"
+	start_time = "2021-11-16T00:00:00Z"
 	end_time = add_day(start_time)
 	days = 3
 	output, count, query = load_args()
-	query_dict = {"start_time": "2021-11-15T00:00:00Z",
-	"end_time":"2021-11-18T00:00:00Z", "max_results": 100, "query": query, "tweet.fields":"created_at,entities,lang"
+	query_dict = {"start_time": start_time,
+	"end_time": end_time, "max_results": 100, "query": query, "tweet.fields":"created_at,entities,lang"
 	}
 	data = collect_tweets(query_dict, count, days)
 	generate_output(output, data)
