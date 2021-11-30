@@ -185,6 +185,19 @@ def filter_hashtags(df):
 
 '''
 Function that filters the DataFrame and
+removes the repeated tweets.
+The tweets are filtered depending on 
+the id.
+
+Takes DataFrame
+Returns DataFrame
+'''
+def remove_duplicate_tweets(df):
+	df = df.drop_duplicates()
+	return df
+
+'''
+Function that filters the DataFrame and
 returns only the tweets in that contain
 tags @ in the given list.
 
@@ -202,8 +215,38 @@ key words in the tweet text.
 Takes DataFrame
 Returns DataFrame
 '''
-def filter_tags_tweet_text(df, keywords_list):
-	pass
+def filter_tags_tweet_text(df_nohashtag, keywords_list):
+	isRelevant = False
+	isRelevant_list = []
+
+	for i,row in df_nohashtag.iterrows():
+		#Check if this row has hashtags
+		curr_hashtags = row['hashtags'].strip('[').strip(']').split(',')
+		new_hash = []
+		for h in curr_hashtags:
+			new_hash.append(h.strip("'").strip(' ').strip("'").lower())
+		# print(new_hash[0])
+		if(new_hash[0] == ""):
+			# print(curr_hashtags)
+			# print("No hashtags")
+			curr_text = row['text'].strip('b').strip("'").split()
+			for w in curr_text:
+				if w in keywords_list:
+					isRelevant = True
+					break
+		else:
+			isRelevant = True
+
+		isRelevant_list.append(isRelevant)
+		isRelevant = False
+
+	df_nohashtag['isRelevant_text'] = isRelevant_list
+	return df_nohashtag
+
+def filter_text(df):
+	df = df[df.isRelevant_text]
+	return df
+		
 
 #*********************************Main*********************************
 def main():
@@ -212,6 +255,7 @@ def main():
 	output_fpath, output_folder = get_absfpath(args.output)
 
 	data_df = read_tsv(input_fpath)
+	# print("Before cleaning: ", data_df.head())
 	data_df = filter_language(data_df)
 
 	hashtags_list = ['', 'shangchi', 'katychen', 'xialing', 'wenwu', 'mengerzhang', 'tenrings', 'thetenrings', 'simuliu',
@@ -219,12 +263,18 @@ def main():
 						'michelleyeoh', 'falachen', 'yingli', '']
 	# potential_hashtags = ['henrylau', 'richbrian', 'alwaysrising', 'babasays']
 	# tag_list = ['']
-	# key_words = ['']
+	key_words = ['', 'shangchi', 'katychen', 'xialing', 'wenwu', 'mengerzhang', 'tenrings', 'thetenrings', 'simuliu',
+						'awkwafina', 'meng', 'benkingsley', 'shangchiandthelegendofthetenrings', 'tonyleung', 'tonyleungchiuwai'
+						'michelleyeoh', 'falachen', 'yingli', '@shangchi']
 
 	data_df = isRelevant_hashtags(data_df, hashtags_list)
 	data_df = filter_hashtags(data_df)
+	data_df = remove_duplicate_tweets(data_df)
+	data_df = filter_tags_tweet_text(data_df, key_words)
+	data_df = filter_text(data_df)
 
-	print(data_df.head())
+	print()
+	print("After cleaning: ", data_df.head())
 
 	create_output_CSV(data_df, output_fpath, sep='\t')
 
