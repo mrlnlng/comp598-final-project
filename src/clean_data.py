@@ -9,7 +9,7 @@ movie.
 
 Command to run: python clean_data.py -i ../data/collected_tweets_10000.tsv -o ../data/clean_data.tsv
 
-Authors: Teresa Altamirano Mayoral, Parsa Yadollahi
+Author: Teresa Altamirano Mayoral
 '''
 #*********************************Imports*********************************
 import sys, os
@@ -19,6 +19,12 @@ import json
 import math
 import networkx as nx
 import numpy as np
+# from datetime import datetime
+# from datetime import date
+import datetime
+import pytz
+from collections import Counter
+
 
 
 #*********************************Functions*********************************
@@ -103,7 +109,7 @@ Takes String
 Returns DataFrame
 '''
 def read_csv(fpath):
-	df = pd.read_csv(fpath)
+	df = pd.read_csv(fpath, index_col=True)
 
 	return df
 
@@ -153,7 +159,7 @@ Returns DataFrame
 '''
 def isRelevant_hashtags(df, hashtags_list):
 	num_rows = len(df.index)
-	print(num_rows)
+	# print(num_rows)
 	isRelevant = False
 	isRelevant_list = []
 
@@ -179,6 +185,14 @@ def isRelevant_hashtags(df, hashtags_list):
 
 	return df
 
+'''
+Function returns a DataFrame containing
+only the rows where 'isRelevant' is
+True.
+
+Takes DataFrame
+Returns DataFrame
+'''
 def filter_hashtags(df):
 	df = df[df.isRelevant]
 	return df
@@ -193,19 +207,9 @@ Takes DataFrame
 Returns DataFrame
 '''
 def remove_duplicate_tweets(df):
-	df = df.drop_duplicates()
+	df = df.drop_duplicates(subset=['text'])
+	# print(df.head())
 	return df
-
-'''
-Function that filters the DataFrame and
-returns only the tweets in that contain
-tags @ in the given list.
-
-Takes DataFrame
-Returns DataFrame
-'''
-def filter_tags_tweet_text(df, at_list):
-	pass
 
 '''
 Function that filters the DataFrame and
@@ -243,9 +247,76 @@ def filter_tags_tweet_text(df_nohashtag, keywords_list):
 	df_nohashtag['isRelevant_text'] = isRelevant_list
 	return df_nohashtag
 
+'''
+Function returns a DataFrame containing
+only the rows where 'isRelevant_text' is
+True.
+
+Takes DataFrame
+Returns DataFrame
+'''
 def filter_text(df):
 	df = df[df.isRelevant_text]
 	return df
+
+'''
+Function that creates a file of
+all the tweets without hashtags.
+
+Takes DataFrame
+Returns -
+'''
+def get_no_hashtag_sample(df):
+	texts = []
+	for i,row in df.iterrows():
+		#Check if this row has hashtags
+		curr_hashtags = row['hashtags'].strip('[').strip(']').split(',')
+		new_hash = []
+		for h in curr_hashtags:
+			new_hash.append(h.strip("'").strip(' ').strip("'").lower())
+		if(new_hash[0] == ""):
+			# curr_text = row['text']
+			texts.append([row['id'], row['text'],row['hashtags']])
+
+	df = pd.DataFrame(texts, columns=['id','text', 'hashtags'])
+	create_output_CSV(df, "noHashtag.tsv", folder='../data/', sep='\t')
+
+
+'''
+Function that transforms the dates
+in TSV into datetime objects. Returns
+a list of dates of the form:
+YEAR-MONTH-DAY
+
+Takes DataFrame
+Returns List
+'''
+def to_datetime(df):
+	dates = []
+	for i, row in df.iterrows():
+		# print(datetime.strptime(row['created_at'][:-1], '%Y-%m-%dT%H:%M:%S.%f'))
+		try:
+			dt = datetime.datetime.strptime(row['created_at'][:-1], '%Y-%m-%dT%H:%M:%S.%f')
+			d_truncated = datetime.date(dt.year, dt.month, dt.day)
+			# print(d_truncated)
+			dates.append(d_truncated)
+		except ValueError as e:
+			print('invalid date')
+	return dates
+
+'''
+Function that prints and outputs a dictionary
+of the days that are in the df with the number
+of tweets per day.
+
+Takes DataFrame
+Returns Dictionary
+'''
+def get_number_of_rows_per_day(df):
+	dates = to_datetime(df)
+	count = dict(Counter(dates))
+	print(count)
+	print(count)
 		
 
 #*********************************Main*********************************
@@ -255,26 +326,27 @@ def main():
 	output_fpath, output_folder = get_absfpath(args.output)
 
 	data_df = read_tsv(input_fpath)
-	# print("Before cleaning: ", data_df.head())
 	data_df = filter_language(data_df)
 
 	hashtags_list = ['', 'shangchi', 'katychen', 'xialing', 'wenwu', 'mengerzhang', 'tenrings', 'thetenrings', 'simuliu',
 						'awkwafina', 'meng', 'benkingsley', 'shangchiandthelegendofthetenrings', 'tonyleung', 'tonyleungchiuwai'
 						'michelleyeoh', 'falachen', 'yingli', '']
-	# potential_hashtags = ['henrylau', 'richbrian', 'alwaysrising', 'babasays']
-	# tag_list = ['']
 	key_words = ['', 'shangchi', 'katychen', 'xialing', 'wenwu', 'mengerzhang', 'tenrings', 'thetenrings', 'simuliu',
 						'awkwafina', 'meng', 'benkingsley', 'shangchiandthelegendofthetenrings', 'tonyleung', 'tonyleungchiuwai'
-						'michelleyeoh', 'falachen', 'yingli', '@shangchi']
+						'michelleyeoh', 'falachen', 'yingli', '@shangchi', '@simuliu', 'shang chi', 'shang-chi']
 
 	data_df = isRelevant_hashtags(data_df, hashtags_list)
 	data_df = filter_hashtags(data_df)
 	data_df = remove_duplicate_tweets(data_df)
+
+	# get_no_hashtag_sample(data_df)
+
 	data_df = filter_tags_tweet_text(data_df, key_words)
 	data_df = filter_text(data_df)
+	data_df.reset_index(drop=True, inplace=True)
 
-	print()
-	print("After cleaning: ", data_df.head())
+	get_number_of_rows_per_day(data_df)
+
 
 	create_output_CSV(data_df, output_fpath, sep='\t')
 
