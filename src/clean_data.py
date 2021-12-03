@@ -22,6 +22,7 @@ import numpy as np
 # from datetime import datetime
 # from datetime import date
 import datetime
+from pandas.core.frame import DataFrame
 import pytz
 from collections import Counter
 
@@ -108,8 +109,8 @@ a Data Frame
 Takes String
 Returns DataFrame
 '''
-def read_csv(fpath):
-	df = pd.read_csv(fpath, index_col=True)
+def read_csv(fpath) -> DataFrame:
+	df: DataFrame = pd.read_csv(fpath, index_col=True)
 
 	return df
 
@@ -200,7 +201,7 @@ def filter_hashtags(df):
 '''
 Function that filters the DataFrame and
 removes the repeated tweets.
-The tweets are filtered depending on 
+The tweets are filtered depending on
 the id.
 
 Takes DataFrame
@@ -317,7 +318,7 @@ def get_number_of_rows_per_day(df):
 	count = dict(Counter(dates))
 	print(count)
 	print(count)
-		
+
 
 #*********************************Main*********************************
 def main():
