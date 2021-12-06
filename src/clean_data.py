@@ -96,11 +96,11 @@ def create_output_CSV(df, fpath, folder='', overwrite=True, sep=','):
 	else:
 		mode = 'a'
 	try:
-		df.to_csv(fpath, sep=sep)
+		df.to_csv(fpath, sep=sep, index=False)
 	except:
 		# print(path)
 		os.mkdir(folder)
-		df.to_csv(fpath, sep=sep)
+		df.to_csv(fpath, sep=sep, index=False)
 
 '''
 Function reads a CSV given an absolute path and returns
@@ -318,6 +318,19 @@ def get_number_of_rows_per_day(df):
 	count = dict(Counter(dates))
 	print(count)
 	print(count)
+
+'''
+Function that prints and outputs the top 8
+topics found in the dataframe in a span of 200 tweets
+
+Takes String (absolute path of Dataframe file)
+Returns None
+'''
+def get_topics(fpath: str) -> None:
+  df = read_tsv(fpath=fpath)
+  labels = pd.DataFrame(df['topics'])
+
+  print(json.dumps(Counter(labels.dropna(axis=0)['topics'].to_list()) ,indent=4))
 
 
 #*********************************Main*********************************
