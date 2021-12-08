@@ -7,5 +7,5 @@ All work related to Comp 598 Final Project
 - **ads 17**: When the tweets purpose is to advertize the movie.
 - **stream 16**: When the tweet talks about which streaming service the movie is on.
 - **visuals 15**: When the tweet talks about the
-- **reviews 16**: When the tweet reviews the movie.
+- **reviews 16**: When the tweet reviews the movie, gives a personal opinion. This can be done implicitly or explicitly. If there is more information that concerns another category, the other topic has precedence.
 - **compare 11**: When the tweet compares the movie with other movies (usually Marvel movies)
