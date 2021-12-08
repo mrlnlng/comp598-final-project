@@ -5,3 +5,4 @@ textblob==0.17.1
 tweepy==4.4.0
 langdetect==1.0.9
 sklearn==0.0
+emoji==1.6.1

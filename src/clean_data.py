@@ -317,7 +317,6 @@ def get_number_of_rows_per_day(df):
 	dates = to_datetime(df)
 	count = dict(Counter(dates))
 	print(count)
-	print(count)
 
 '''
 Function that prints and outputs the top 8
@@ -326,11 +325,30 @@ topics found in the dataframe in a span of 200 tweets
 Takes String (absolute path of Dataframe file)
 Returns None
 '''
-def get_topics(fpath: str) -> None:
+def print_topics(fpath: str) -> None:
   df = read_tsv(fpath=fpath)
   labels = pd.DataFrame(df['topics'])
 
-  print(json.dumps(Counter(labels.dropna(axis=0)['topics'].to_list()) ,indent=4))
+  json_pretty_print(Counter(labels.dropna(axis=0)['topics'].to_list()))
+
+'''
+Function that returns the top 8 topics
+found in the dataframe in a span of 200 tweets
+
+Takes String (absolute path of Dataframe file)
+Returns Dataframe
+'''
+def get_topics(fpath: str) -> DataFrame:
+  df = read_tsv(fpath=fpath)
+  return df[df['topics'].notna()]
+
+'''
+  Function that pretty prints a dictionary
+  into proper JSON format
+'''
+def json_pretty_print(d, sort_keys=False) -> None:
+  print(json.dumps(d ,indent=4, sort_keys=sort_keys))
+
 
 
 #*********************************Main*********************************
