@@ -16,4 +16,4 @@ Tweets to be reviewed by the team:
 345
 
 **Link to Final Report**:
-- [Google docs](https://docs.google.com/document/d/1ySCLX1xK3YnZ7ufA0hrUhIm9_8G_bVkkpUacEgoSiBs/edit)
+- [Google docs](https://docs.google.com/document/d/1ySCLX1xK3YnZ7ufA0hrUhIm9_8G_bVkkpUacEgoSiBs/edit?usp=sharing)
