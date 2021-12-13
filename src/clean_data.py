@@ -110,7 +110,7 @@ Takes String
 Returns DataFrame
 '''
 def read_csv(fpath) -> DataFrame:
-	df: DataFrame = pd.read_csv(fpath, index_col=True)
+	df: DataFrame = pd.read_csv(fpath)
 
 	return df
 
@@ -339,7 +339,7 @@ Takes String (absolute path of Dataframe file)
 Returns Dataframe
 '''
 def get_topics(fpath: str) -> DataFrame:
-  df = read_tsv(fpath=fpath)
+  df = read_csv(fpath=fpath)
   return df[df['topics'].notna()]
 
 '''
