@@ -23,6 +23,7 @@ import math
 def main() -> None:
   dialogs: dict = compute_dialogs()
   tfidf_dict: dict = compute_tfidf(dialogs)
+  # json_pretty_print(tfidf_dict)
 
 
 '''
@@ -92,7 +93,7 @@ def compute_tfidf(dialogs: dict) -> dict:
   },
 '''
 def compute_dialogs() -> dict:
-  fpath: str = './../data/clean_data_topics.tsv'
+  fpath: str = './../data/clean_data_annotated_1000.csv'
   df: DataFrame = get_topics(fpath=fpath)
 
   dialogs = {}
