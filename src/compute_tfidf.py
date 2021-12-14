@@ -2,6 +2,7 @@
 import json
 import emoji
 import nltk
+from nltk.corpus import stopwords
 from pandas.core.frame import DataFrame
 import re
 from clean_data import get_topics, json_pretty_print
@@ -70,7 +71,7 @@ def compute_tfidf(dialogs: dict) -> dict:
     tfidf_dict_top[category] = {}
     sorted_tf_idf_scores = sorted((tfidf_dict[category]).items(), key=lambda x: x[1], reverse=True)[:10]
     for (word, score) in sorted_tf_idf_scores:
-      tfidf_dict_top[category][word] = score
+      tfidf_dict_top[category][word] = round(score, 3)
 
   json_pretty_print(tfidf_dict_top)
   return tfidf_dict_top
@@ -120,13 +121,19 @@ def compute_dialogs() -> dict:
 
 
 def clean_tweet(tweet: str) -> str:
+  stop_set = set(stopwords.words('english'))
+
+  tweet: str = tweet[2:] # [:2] to remove b'
+  # import pdb; pdb.set_trace()
   tweet: str = re.sub("@[A-Za-z0-9]+","", tweet) # Remove @ sign
   tweet: str = re.sub(r"(?:\@|http?\://|https?\://|www)\S+", "", tweet) # Remove http links
   tweet: str = " ".join(tweet.split())
   tweet: str = ''.join(c for c in tweet if c not in emoji.UNICODE_EMOJI) # Remove Emojis
-  tweet: str = tweet.replace("#", "").replace("_", " ") # Remove hashtag sign but keep the text
-  tweet = " ".join(w.lower() for w in nltk.wordpunct_tokenize(tweet) if w.isalpha())
-  return tweet[2:] # [:2] to remove b'
+  tweet: str = tweet.replace("#", "").replace("_", " ").replace("-", "") # Remove hashtag sign but keep the text
+  tweet: str = " ".join(w.lower() for w in nltk.wordpunct_tokenize(tweet) if w.isalpha())
+  tweet: str = ' '.join([word for word in tweet.split() if word not in stop_set])
+  tweet: str = ' '.join([word for word in tweet.split() if len(word) > 2])
+  return tweet
 
 if __name__ == '__main__':
   main()
